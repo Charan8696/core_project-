@@ -1,0 +1,19 @@
+START
+ Initialize camera
+ Load face detection and mask detection models
+ WHILE system is active DO
+    Capture frame from camera
+    Preprocess frame (resize, normalize)
+    faces = detect_faces(frame)
+    FOR each face in faces DO
+        roi = extract_face_roi(face)
+        mask_status = classify_mask(roi)
+        IF mask_status == "No Mask" THEN
+            trigger_alert()
+            log_violation(face, mask_status)
+        ENDIF
+        store_detection(face, mask_status)
+    ENDFOR
+    update_dashboard()
+ ENDWHILE
+ STOP
