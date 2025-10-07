@@ -1,0 +1,52 @@
+1 i m p o r t s t r e a m l i t as s t
+ 2 from i n f e r e n c e s d k i m p o r t I n f e r e n c e H T T P C l i e n t
+ 3 from PIL i m p o r t Image , ImageDraw
+ 4 i m p o r t i o
+ 5 i m p o r t t e m p f i l e
+ 7 # I n i t i a l i z e Roboflow C l i e n t
+ 8 CLIENT = I n f e r e n c e H T T P C l i e n t (
+ 9 a p i u r l =" h t t p s : / / d e t e c t . r o b o f l o w . com" ,
+ 10 a p i k e y =" 0wCuSlFsDHkh6SSLb5iq "
+ 11 )
+ 13 d e f i n f e r i m a g e ( i m a g e p a t h ) :
+ 14 r e s u l t = CLIENT . i n f e r ( image path , m o d e l i d =" fb - g h d l l / 2 " )
+ 15 r e t u r n r e s u l t
+ 17 d e f draw boxes ( image , d e t e c t i o n s ) :
+ 18 draw = ImageDraw . Draw ( image )
+ 19 f o r d e t e c t i o n i n d e t e c t i o n s . g e t ( " p r e d i c t i o n s " , [ ] ) :
+ 20 x , y , width , h e i g h t = d e t e c t i o n [ " x " ] , d e t e c t i o n [ " y " ] , d e t
+ e c t i o n [ " width " ] , d e t e c t i o n [ " h e i g h t " ]
+ 21 c o n f i d e n c e = d e t e c t i o n [ " c o n f i d e n c e " ]
+ 22 l a b e l = d e t e c t i o n [ " c l a s s " ]
+ 24 # C a l c u l a t e bounding box c o o r d i n a t e s
+ 25 l e f t = x - width / 2
+ 26 t o p = y - h e i g h t / 2
+ 27 r i g h t = x + width / 2
+ 28 bottom = y + h e i g h t / 2
+ 30 # Draw bounding box and l a b e l
+ 31 draw . r e c t a n g l e ( [ l e f t , top , r i g h t , bottom ] , o u t l i n e =" r e d " ,
+ width =3)
+ 32 draw . t e x t ( ( l e f t , t o p - 10) , f "{ l a b e l }: { c o n f i d e n c e : . 2 f }" ,
+ f i l l =" r e d " )
+ 33 r e t u r n image
+ 35 # S t r e a m l i t UI
+ 36 s t . t i t l e ( " Roboflow Image D e t e c t i o n i n S t r e a m l i t " )
+ 38 u p l o a d e d f i l e = s t . f i l e u p l o a d e r ( " Upload an Image " , t y p e =[ " j
+ p g " , " j p e g " , " png " ] )
+ 40 i f u p l o a d e d f i l e i s n o t None :
+ 41 image = Image . open ( u p l o a d e d f i l e )
+ 42 s t . image ( image , c a p t i o n =" Uploaded Image " , u s e c o l u m n w i d t h =True )
+ 44 # Save image t o a t e m p o r a r y f i l e
+ 45 wi th t e m p f i l e . NamedTemporaryFile ( d e l e t e = F a l s e , s u f f i x =" . j p g "
+ ) as t e m p f i l e :
+ 46 image . s av e ( t e m p f i l e , f o r m a t ="JPEG" )
+ 47 t e m p f i l e p a t h = t e m p f i l e . name
+49 # Run i n f e r e n c e
+ 50 s t . w r i t e ( " D e t e c t i n g o b j e c t s . . . " )
+ 51 r e s u l t = i n f e r i m a g e ( t e m p f i l e p a t h )
+ 53 # Draw bounding boxes
+ 54 i m a g e w i t h b o x e s = draw boxes ( image , r e s u l t )
+ 55 s t . image ( i m a g e w i t h b o x e s , c a p t i o n =" D e t e c t e d O b j e c t s " ,
+ u s e c o l u m n w i d t h =True )
+ 57 # D i s p l a y d e t e c t i o n r e s u l t s as JSON
+ 58 s t . j s o n ( r e s u l t 
